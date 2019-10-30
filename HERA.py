@@ -195,6 +195,23 @@ async def on_message(message):
             embed.add_field(name="Times they've been got", value=times, inline=True)
             await channel.send(embed=embed) 
 
+        if msgStartsWith(message, pre + 'update'):
+            msg = message.content
+            if len(message.mentions) != 1 or (msg.find("+") == -1 and msg.find("-") == -1): 
+                await channel.send("Bad syntax:\n" + pre +" @user +/-[value]")
+                return
+            else: uuid = message.mentions[0].id
+            split = max([msg.find("+"), msg.find("-")])
+            if msg[split] == "+": split += 1
+            value = int(msg[split:].strip())
+            author_stats = stats.get_definition(str(uuid))
+            if author_stats == None: author_stats = 0
+            stats.update_value({str(uuid) : int(author_stats) + value})
+            await channel.send(client.get_user(uuid).name +" has now been dad'ed " + str(stats.get_definition(str(uuid)) + " times."))
+
+
+            
+
 @client.event
 async def on_ready():
     print('Logged in as')
