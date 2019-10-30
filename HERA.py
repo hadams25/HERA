@@ -108,7 +108,7 @@ async def on_message(message):
             else:
                 stats.update_value({str(message.author.id) : int(author_stats) + 1})
     except:
-        print(message.content)
+        print(str(message.content))
     
     if msgStartsWith(message, pre + 'leaderboard'):
             if stats.get_length() < 10: _max = stats.get_length()
