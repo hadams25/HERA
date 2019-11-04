@@ -83,6 +83,11 @@ async def on_message(message):
         elif len(message.mentions) > 1: return
         else: 
             uuid = message.author.id
+            msg_length = len(message.content.strip())
+            if msg_length > len(pre + "stats"): 
+                await channel.send("Bad syntax: `" + pre + "stats [@mention]` \n" +
+                "`//mention is optional, if none is given then it will return the author's stats`")
+                return
         author_stats = stats.get_definition(str(uuid))
         if author_stats == None:
             author_stats = 0
