@@ -7,12 +7,11 @@ TOKEN = f.readToken()
 client = discord.Client()
 noreply = []
 noreply = f.readBlacklist()
-pre = "~"
+pre = "!"
 stats = writer.dict_writer(file = "usage_stats.txt")
 if not stats.does_exist: stats.generate_file()
 def msgStartsWith(message, str): return message.content.lower().startswith(str)
 
-#this code is so bad
 @client.event
 async def on_message(message):
     channel = message.channel
@@ -26,9 +25,14 @@ async def on_message(message):
 
     # Reply with the user's UUID
     if msgStartsWith(message, pre + 'id'): 
-        if len(message.mentions) == 1: 
+        if len(message.mentions) > 1: return
+        elif len(message.mentions) == 1: 
             uuid = message.mentions[0].id
-        elif len(message.mentions) > 1: return
+            msg_length = len(message.content)
+            if msg_length - len(message.mentions[0].mention) > len(pre + "id "): 
+                await channel.send("Bad syntax: `" + pre + "id [@mention]` \n" +
+                "`//mention is optional, if none is given then it will return the author's uuid`")
+                return
         else: 
             uuid = message.author.id
         await channel.send(client.get_user(uuid).name +"'s UUID is: " + str(uuid))
@@ -150,6 +154,10 @@ async def on_message(message):
 
     #creator only commands
     if message.author.id == 243885191527923723:
+        if msgStartsWith(message, '?stop') and client.user.name == "HeraBeta":
+            await channel.send("Beta shutdown...")
+            await client.logout()
+
         if msgStartsWith(message, pre + 'stop'):
             await channel.send("Going offline...")
             await client.logout()
