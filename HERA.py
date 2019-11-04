@@ -97,32 +97,29 @@ async def on_message(message):
         else:
             await channel.send(client.get_user(uuid).name + " has been dad'ed " + str(author_stats) + " times.")
 
-    try:
-        #I’m
-        # this if statement causes an error for some reason
-        if msgStartsWith(message, "im ") or msgStartsWith(message, "me ") or ( ord(message.content.lower()[0]) == 105 and (ord(message.content.lower()[1]) == 39 or ord(message.content.lower()[1]) == 8217) and ord(message.content.lower()[2]) == 109 and message.content.lower()[3] == " "):
-            if message.author.id in noreply: return
-            msg = message.content
-            if len(msg.split()) < 2: return
-            msg = msg[msg.find(" ") + 1:]
-            if len(msg.split()) == 1:
-                if msg[-1] == ".":
-                    msg = msg[0:len(msg)-1]
-                if len(msg) == 1 and not 97 <= ord(msg.lower()) <= 122: return
-            elif len(msg.split()) >= 2:
-                splitIndex = max([msg.find("."), msg.find(",")])
-                if splitIndex == -1: splitIndex = len(msg)
-                msg = msg[:splitIndex]
-            if msg == "": return
-            msg = msg.replace("\n", "")
-            await channel.send("Hi "+msg+", I'm Hera")
-            author_stats = stats.get_definition(str(message.author.id))
-            if author_stats == None:
-                stats.update_value({str(message.author.id) : 1})
-            else:
-                stats.update_value({str(message.author.id) : int(author_stats) + 1})
-    except:
-        print(str(message.content))
+    #I’m
+    # this if statement causes an error for some reason
+    if msgStartsWith(message, "im ") or msgStartsWith(message, "me ") or ( ord(message.content.lower()[0]) == 105 and (ord(message.content.lower()[1]) == 39 or ord(message.content.lower()[1]) == 8217) and ord(message.content.lower()[2]) == 109 and message.content.lower()[3] == " "):
+        if message.author.id in noreply: return
+        msg = message.content
+        if len(msg.split()) < 2: return
+        msg = msg[msg.find(" ") + 1:]
+        if len(msg.split()) == 1:
+            if msg[-1] == ".":
+                msg = msg[0:len(msg)-1]
+            if len(msg) == 1 and not 97 <= ord(msg.lower()) <= 122: return
+        elif len(msg.split()) >= 2:
+            splitIndex = max([msg.find("."), msg.find(",")])
+            if splitIndex == -1: splitIndex = len(msg)
+            msg = msg[:splitIndex]
+        if msg == "": return
+        msg = msg.replace("\n", "")
+        await channel.send("Hi "+msg+", I'm Hera")
+        author_stats = stats.get_definition(str(message.author.id))
+        if author_stats == None:
+            stats.update_value({str(message.author.id) : 1})
+        else:
+            stats.update_value({str(message.author.id) : int(author_stats) + 1})
     
     if msgStartsWith(message, pre + 'leaderboard'):
             if stats.get_length() < 10: _max = stats.get_length()
