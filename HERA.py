@@ -172,44 +172,6 @@ async def on_message(message):
         if msgStartsWith(message, pre + 'speak'):
            await channel.send(message.content[7:])
 
-        if msgStartsWith(message, pre + 'embed'):
-            if stats.get_length() < 10: _max = stats.get_length()
-            else: _max = 10
-            board = []
-            for i in range(0,_max):
-                board.append([0,0])
-
-            board[0][0] = stats.get_key(0)
-            board[0][1] = int(stats.get_val_from_line(0))
-
-            for i in range(0, stats.get_length()):
-                tmp = int(stats.get_val_from_line(i))
-                if client.get_user(int(stats.get_key(i))) == None: pass
-                elif board[0][1] < tmp:
-                    board = f.shift(board, 0)
-                    board[0][0] = stats.get_key(i)
-                    board[0][1] = tmp
-                elif board[len(board) - 1][1] > tmp: continue
-                elif board[0][1] > tmp:
-                    j = 1
-                    while board[j][1] > tmp and j < len(board):
-                        j += 1
-                    if j != len(board) - 1:
-                        board = f.shift(board, j)
-                        board[j][0] = stats.get_key(i)
-                        board[j][1] = tmp
-            users = ""
-            times = ""
-            for x in board:
-                print(str(x[0]))
-                if not x[0] == 0:
-                    users += "\n" + client.get_user(int(x[0])).name
-                    times += "\n" + str(x[1])
-            embed=discord.Embed(title="Dad Bot Leaderboard", color=0x800040)
-            embed.add_field(name="Users", value=users, inline=True)
-            embed.add_field(name="Times they've been got", value=times, inline=True)
-            await channel.send(embed=embed) 
-
         if msgStartsWith(message, pre + 'update'):
             msg = message.content
             if len(message.mentions) != 1 or (msg.find("+") == -1 and msg.find("-") == -1): 
