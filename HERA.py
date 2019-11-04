@@ -98,7 +98,7 @@ async def on_message(message):
             await channel.send(client.get_user(uuid).name + " has been dad'ed " + str(author_stats) + " times.")
 
     #I’m
-    # this if statement causes an error for some reason
+    # this if statement sometimes causes an index out of bounds error for some reason
     if msgStartsWith(message, "im ") or msgStartsWith(message, "me ") or ( ord(message.content.lower()[0]) == 105 and (ord(message.content.lower()[1]) == 39 or ord(message.content.lower()[1]) == 8217) and ord(message.content.lower()[2]) == 109 and message.content.lower()[3] == " "):
         if message.author.id in noreply: return
         msg = message.content
