@@ -7,7 +7,7 @@ TOKEN = f.readToken()
 client = discord.Client()
 noreply = []
 noreply = f.readBlacklist()
-pre = "!"
+pre = "?"
 stats = writer.dict_writer(file = "usage_stats.txt")
 if not stats.does_exist: stats.generate_file()
 def msgStartsWith(message, str): return message.content.lower().startswith(str)
@@ -75,6 +75,11 @@ async def on_message(message):
     if msgStartsWith(message, pre + 'stats'):
         if len(message.mentions) == 1: 
             uuid = message.mentions[0].id
+            msg_length = len(message.content)
+            if msg_length - len(message.mentions[0].mention) > len(pre + "stats "): 
+                await channel.send("Bad syntax: `" + pre + "stats [@mention]` \n" +
+                "`//mention is optional, if none is given then it will return the author's stats`")
+                return
         elif len(message.mentions) > 1: return
         else: 
             uuid = message.author.id
