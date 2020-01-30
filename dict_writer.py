@@ -38,10 +38,10 @@ class dict_writer:
                 hasQuote = False
                 if '"' in value and sanity:
                     hasQuote = True
-                    value = self._parse_quote(value, '"', str(line[0] + 1), sanity = sanity)
+                    value = self._parse_quote(value, '"', str(line[0] + 1))
                 if "'" in value and sanity:
                     hasQuote = True
-                    value = self._parse_quote(value, "'", str(line[0] + 1), sanity = sanity)
+                    value = self._parse_quote(value, "'", str(line[0] + 1))
                 if not hasQuote: value = value.replace(" ", "")
                 if self.vars.get(key) == None and not sanity:
                     sys.stderr.write('\nInvalid key assignment in '+self.filename+' on line '+str(line[0] + 1)+'.\n'+
