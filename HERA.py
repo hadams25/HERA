@@ -21,78 +21,187 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    # Essentially ping, without the time measurement: pre + "hello"
-    if msgStartsWith(message, pre + 'hello'): await channel.send('Hey {0.author.mention}'.format(message))
+    #Commands
+    if msgStartsWith(message, pre):
+        message.content = message.content[1:]
+        # Essentially ping, without the time measurement: "hello"
+        if msgStartsWith(message, 'hello'): await channel.send('Hey {0.author.mention}'.format(message))
 
-    # Reply with the user's UUID
-    if msgStartsWith(message, pre + 'id'): 
-        if len(message.mentions) == 1: 
-            uuid = message.mentions[0].id
-        elif len(message.mentions) > 1: return
-        else: 
-            uuid = message.author.id
-        await channel.send(client.get_user(uuid).name +"'s UUID is: " + str(uuid))
+        # Reply with the user's UUID: "id"
+        if msgStartsWith(message, 'id'): 
+            if len(message.mentions) == 1: 
+                uuid = message.mentions[0].id
+            elif len(message.mentions) > 1: return
+            else: 
+                uuid = message.author.id
+            await channel.send(client.get_user(uuid).name +"'s UUID is: " + str(uuid))
 
-    # Adds/removes users from the blacklist: pre + "noreply"
-    if msgStartsWith(message, pre + 'noreply'):
-        if message.author.id in noreply:
-            noreply.remove(message.author.id)
-            f.updateBlacklist(noreply)
-            await channel.send("You have been successfully removed from the blacklist")
-        else:
-            noreply.append(message.author.id)
-            f.updateBlacklist(noreply)
-            await channel.send("You have been added to the blacklist")
+        # Adds/removes users from the blacklist: "noreply"
+        if msgStartsWith(message, 'noreply'):
+            if message.author.id in noreply:
+                noreply.remove(message.author.id)
+                f.updateBlacklist(noreply)
+                await channel.send("You have been successfully removed from the blacklist")
+            else:
+                noreply.append(message.author.id)
+                f.updateBlacklist(noreply)
+                await channel.send("You have been added to the blacklist")
 
-    # Prints the current blacklist: pre + "blacklist"
-    if msgStartsWith(message, pre + 'blacklist'):
-        blacklist = []
-        for i in noreply:
-            user = await client.fetch_user(i)
-            blacklist.append(str(user.display_name))
-        msg = "Currently blacklisted users are: " + ", ".join(blacklist)
-        await channel.send(msg)
+        # Prints the current blacklist: "blacklist"
+        if msgStartsWith(message, 'blacklist'):
+            blacklist = []
+            for i in noreply:
+                user = await client.fetch_user(i)
+                blacklist.append(str(user.display_name))
+            msg = "Currently blacklisted users are: " + ", ".join(blacklist)
+            await channel.send(msg)
 
-    # Prints the help menu: pre + "help"
-    if  msgStartsWith(message, pre + 'help'):
-        msg = ("Hey, {0.author.mention} here's my list of commands.\n".format(message) +
-        pre +'hello - Says hello back and pings you\n' +
-        pre +'noreply - Toggles dad joke opportunity detection for you\n' +
-        pre +"stats - Shows how many times you've been dad'ed\n" +
-        pre +"leaderboard - Shows the top 10 most dad'ed users\n" +
-        pre +'help - Displays this menu\n' +
-        pre +'blacklist - Lists the currently ignored users\n' +
-        pre +'ID - Replies with your UUID\n' +
-        '**HERA** v1.03')
-        await channel.send(msg)
+        # Prints the help menu: "help"
+        if  msgStartsWith(message, 'help'):
+            msg = ("Hey, {0.author.mention} here's my list of commands.\n".format(message) +
+            pre +'hello - Says hello back and pings you\n' +
+            pre +'noreply - Toggles dad joke opportunity detection for you\n' +
+            pre +"stats - Shows how many times you've been dad'ed\n" +
+            pre +"leaderboard - Shows the top 10 most dad'ed users\n" +
+            pre +'help - Displays this menu\n' +
+            pre +'blacklist - Lists the currently ignored users\n' +
+            pre +'ID - Replies with your UUID\n' +
+            '**HERA** v1.03')
+            await channel.send(msg)
 
-    # Replies with the amount of times HERA has replied to the specified user, if no username is given 
-    # then it defaults to the author of the message
-    if msgStartsWith(message, pre + 'stats'):
-        if len(message.mentions) == 1: 
-            uuid = message.mentions[0].id
-        elif len(message.mentions) > 1: return
-        else: 
-            uuid = message.author.id
-        author_stats = stats.get_definition(str(uuid))
-        if author_stats == None:
-            author_stats = 0
-            stats.update_value({str(uuid) : author_stats})
-        if int(author_stats) == 1:
-            await channel.send(client.get_user(uuid).name + " has been dad'ed " + str(author_stats) + " time.")
-        else:
-            await channel.send(client.get_user(uuid).name + " has been dad'ed " + str(author_stats) + " times.")
+        # Replies with the amount of times HERA has replied to the specified user, if no username is given 
+        # then it defaults to the author of the message: "stats"
+        if msgStartsWith(message, 'stats'):
+            if len(message.mentions) == 1: 
+                uuid = message.mentions[0].id
+            elif len(message.mentions) > 1: return
+            else: 
+                uuid = message.author.id
+            author_stats = stats.get_definition(str(uuid))
+            if author_stats == None:
+                author_stats = 0
+                stats.update_value({str(uuid) : author_stats})
+            if int(author_stats) == 1:
+                await channel.send(client.get_user(uuid).name + " has been dad'ed " + str(author_stats) + " time.")
+            else:
+                await channel.send(client.get_user(uuid).name + " has been dad'ed " + str(author_stats) + " times.")
+        
+        # Shows the current top 10 users
+        if msgStartsWith(message, 'leaderboard'):
+                if stats.get_length() < 10: _max = stats.get_length()
+                else: _max = 10
+                board = []
+                for i in range(0,_max):
+                    board.append([0,0])
 
+                board[0][0] = stats.get_key(0)
+                board[0][1] = int(stats.get_val_from_line(0))
+
+                for i in range(0, stats.get_length()):
+                    tmp = int(stats.get_val_from_line(i))
+                    if client.get_user(int(stats.get_key(i))) == None: pass
+                    elif board[0][1] < tmp:
+                        board = f.shift(board, 0)
+                        board[0][0] = stats.get_key(i)
+                        board[0][1] = tmp
+                    elif board[len(board) - 1][1] > tmp: continue
+                    elif board[0][1] > tmp:
+                        j = 1
+                        while board[j][1] > tmp and j < len(board):
+                            j += 1
+                        if j != len(board) - 1:
+                            board = f.shift(board, j)
+                            board[j][0] = stats.get_key(i)
+                            board[j][1] = tmp
+                users = ""
+                times = ""
+                for x in board:
+                    if not x[0] == 0:
+                        users += "\n" + client.get_user(int(x[0])).name
+                        times += "\n" + str(x[1])
+                embed=discord.Embed(title="Dad Bot Leaderboard", color=0x800040)
+                embed.add_field(name="Users", value=users, inline=True)
+                embed.add_field(name="Times they've been got", value=times, inline=True)
+                await channel.send(embed=embed) 
+
+    #creator only commands
+        #checks if the author's user id is @Ketchup#1687
+        if message.author.id == 243885191527923723:
+            #kills the bot
+            if msgStartsWith(message, 'stop'):
+                await channel.send("Going offline...")
+                await client.logout()
+            
+            #makes the bot repeat whatever you say
+            if msgStartsWith(message, 'speak'):
+                await channel.send(message.content[7:])
+
+            #embed test 
+            if msgStartsWith(message, 'embed'):
+                if stats.get_length() < 10: _max = stats.get_length()
+                else: _max = 10
+                board = []
+                for i in range(0,_max):
+                    board.append([0,0])
+
+                board[0][0] = stats.get_key(0)
+                board[0][1] = int(stats.get_val_from_line(0))
+
+                for i in range(0, stats.get_length()):
+                    tmp = int(stats.get_val_from_line(i))
+                    if client.get_user(int(stats.get_key(i))) == None: pass
+                    elif board[0][1] < tmp:
+                        board = f.shift(board, 0)
+                        board[0][0] = stats.get_key(i)
+                        board[0][1] = tmp
+                    elif board[len(board) - 1][1] > tmp: continue
+                    elif board[0][1] > tmp:
+                        j = 1
+                        while board[j][1] > tmp and j < len(board):
+                            j += 1
+                        if j != len(board) - 1:
+                            board = f.shift(board, j)
+                            board[j][0] = stats.get_key(i)
+                            board[j][1] = tmp
+                users = ""
+                times = ""
+                for x in board:
+                    print(str(x[0]))
+                    if not x[0] == 0:
+                        users += "\n" + client.get_user(int(x[0])).name
+                        times += "\n" + str(x[1])
+                embed=discord.Embed(title="Dad Bot Leaderboard", color=0x800040)
+                embed.add_field(name="Users", value=users, inline=True)
+                embed.add_field(name="Times they've been got", value=times, inline=True)
+                await channel.send(embed=embed) 
+
+            #Edits the specified users dad count
+            if msgStartsWith(message, 'update'):
+                msg = message.content
+                if len(message.mentions) != 1 or (msg.find("+") == -1 and msg.find("-") == -1): 
+                    await channel.send("Bad syntax:\n" + pre +" @user +/-[value]")
+                    return
+                else: uuid = message.mentions[0].id
+                split = max([msg.find("+"), msg.find("-")])
+                if msg[split] == "+": split += 1
+                value = int(msg[split:].strip())
+                author_stats = stats.get_definition(str(uuid))
+                if author_stats == None: author_stats = 0
+                stats.update_value({str(uuid) : int(author_stats) + value})
+                await channel.send(client.get_user(uuid).name +" has now been dad'ed " + str(stats.get_definition(str(uuid)) + " times."))
+    #End commands
+
+    #Daddening Logic
     try:
         #if "im" or "me"
         if (msgStartsWith(message, "im ") or msgStartsWith(message, "me ") or 
-            #if "i"
+        #if "i"
             (ord(message.content.lower()[0]) == 105 and 
-            #if "'" or iphone apostrophe
+        #if "'" or iphone apostrophe
             (ord(message.content.lower()[1]) == 39 or ord(message.content.lower()[1]) == 8217) and 
-            #if "m"
+        #if "m"
             ord(message.content.lower()[2]) == 109 and message.content.lower()[3] == " ")):
-            
+
             if message.author.id in noreply: return
             msg = message.content
             if len(msg.split()) < 2: return
@@ -115,106 +224,6 @@ async def on_message(message):
                 stats.update_value({str(message.author.id) : int(author_stats) + 1})
     except:
         print(str(message.content))
-    
-    if msgStartsWith(message, pre + 'leaderboard'):
-            if stats.get_length() < 10: _max = stats.get_length()
-            else: _max = 10
-            board = []
-            for i in range(0,_max):
-                board.append([0,0])
-
-            board[0][0] = stats.get_key(0)
-            board[0][1] = int(stats.get_val_from_line(0))
-
-            for i in range(0, stats.get_length()):
-                tmp = int(stats.get_val_from_line(i))
-                if client.get_user(int(stats.get_key(i))) == None: pass
-                elif board[0][1] < tmp:
-                    board = f.shift(board, 0)
-                    board[0][0] = stats.get_key(i)
-                    board[0][1] = tmp
-                elif board[len(board) - 1][1] > tmp: continue
-                elif board[0][1] > tmp:
-                    j = 1
-                    while board[j][1] > tmp and j < len(board):
-                        j += 1
-                    if j != len(board) - 1:
-                        board = f.shift(board, j)
-                        board[j][0] = stats.get_key(i)
-                        board[j][1] = tmp
-            users = ""
-            times = ""
-            for x in board:
-                if not x[0] == 0:
-                    users += "\n" + client.get_user(int(x[0])).name
-                    times += "\n" + str(x[1])
-            embed=discord.Embed(title="Dad Bot Leaderboard", color=0x800040)
-            embed.add_field(name="Users", value=users, inline=True)
-            embed.add_field(name="Times they've been got", value=times, inline=True)
-            await channel.send(embed=embed) 
-
-
-    #creator only commands
-    if message.author.id == 243885191527923723:
-        if msgStartsWith(message, pre + 'stop'):
-            await channel.send("Going offline...")
-            await client.logout()
-        
-        if msgStartsWith(message, pre + 'speak'):
-           await channel.send(message.content[7:])
-
-        if msgStartsWith(message, pre + 'embed'):
-            if stats.get_length() < 10: _max = stats.get_length()
-            else: _max = 10
-            board = []
-            for i in range(0,_max):
-                board.append([0,0])
-
-            board[0][0] = stats.get_key(0)
-            board[0][1] = int(stats.get_val_from_line(0))
-
-            for i in range(0, stats.get_length()):
-                tmp = int(stats.get_val_from_line(i))
-                if client.get_user(int(stats.get_key(i))) == None: pass
-                elif board[0][1] < tmp:
-                    board = f.shift(board, 0)
-                    board[0][0] = stats.get_key(i)
-                    board[0][1] = tmp
-                elif board[len(board) - 1][1] > tmp: continue
-                elif board[0][1] > tmp:
-                    j = 1
-                    while board[j][1] > tmp and j < len(board):
-                        j += 1
-                    if j != len(board) - 1:
-                        board = f.shift(board, j)
-                        board[j][0] = stats.get_key(i)
-                        board[j][1] = tmp
-            users = ""
-            times = ""
-            for x in board:
-                print(str(x[0]))
-                if not x[0] == 0:
-                    users += "\n" + client.get_user(int(x[0])).name
-                    times += "\n" + str(x[1])
-            embed=discord.Embed(title="Dad Bot Leaderboard", color=0x800040)
-            embed.add_field(name="Users", value=users, inline=True)
-            embed.add_field(name="Times they've been got", value=times, inline=True)
-            await channel.send(embed=embed) 
-
-        if msgStartsWith(message, pre + 'update'):
-            msg = message.content
-            if len(message.mentions) != 1 or (msg.find("+") == -1 and msg.find("-") == -1): 
-                await channel.send("Bad syntax:\n" + pre +" @user +/-[value]")
-                return
-            else: uuid = message.mentions[0].id
-            split = max([msg.find("+"), msg.find("-")])
-            if msg[split] == "+": split += 1
-            value = int(msg[split:].strip())
-            author_stats = stats.get_definition(str(uuid))
-            if author_stats == None: author_stats = 0
-            stats.update_value({str(uuid) : int(author_stats) + value})
-            await channel.send(client.get_user(uuid).name +" has now been dad'ed " + str(stats.get_definition(str(uuid)) + " times."))
-
 
             
 
