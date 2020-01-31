@@ -2,12 +2,15 @@
 
 def readBlacklist():
     noreply = []
-    out = open("noreply.txt",mode = 'r',encoding = 'utf-8')
-    line = out.readline()
-    while line:
-        noreply.append(int(line))
+    try:
+        out = open("noreply.txt",mode = 'r',encoding = 'utf-8')
         line = out.readline()
-    out.close()
+        while line:
+            noreply.append(int(line))
+            line = out.readline()
+        out.close()
+    except FileNotFoundError:
+        open("noreply.txt",mode = 'w',encoding = 'utf-8')
     return noreply
 
 def updateBlacklist(x):
