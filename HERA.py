@@ -24,37 +24,6 @@ async def on_message(message):
     #Commands
     if msgStartsWith(message, pre):
         message.content = message.content[1:]
-        # Essentially ping, without the time measurement: "hello"
-        if msgStartsWith(message, 'hello'): await channel.send('Hey {0.author.mention}'.format(message))
-
-        # Reply with the user's UUID: "id"
-        if msgStartsWith(message, 'id'): 
-            if len(message.mentions) == 1: 
-                uuid = message.mentions[0].id
-            elif len(message.mentions) > 1: return
-            else: 
-                uuid = message.author.id
-            await channel.send(client.get_user(uuid).name +"'s UUID is: " + str(uuid))
-
-        # Adds/removes users from the blacklist: "noreply"
-        if msgStartsWith(message, 'noreply'):
-            if message.author.id in noreply:
-                noreply.remove(message.author.id)
-                f.updateBlacklist(noreply)
-                await channel.send("You have been successfully removed from the blacklist")
-            else:
-                noreply.append(message.author.id)
-                f.updateBlacklist(noreply)
-                await channel.send("You have been added to the blacklist")
-
-        # Prints the current blacklist: "blacklist"
-        if msgStartsWith(message, 'blacklist'):
-            blacklist = []
-            for i in noreply:
-                user = await client.fetch_user(i)
-                blacklist.append(str(user.display_name))
-            msg = "Currently blacklisted users are: " + ", ".join(blacklist)
-            await channel.send(msg)
 
         # Prints the help menu: "help"
         if  msgStartsWith(message, 'help'):
@@ -69,7 +38,21 @@ async def on_message(message):
             '**HERA** v1.03')
             await channel.send(msg)
 
-        # Replies with the amount of times HERA has replied to the specified user, if no username is given 
+        # Essentially ping, without the time measurement: "hello"
+        if msgStartsWith(message, 'hello'): await channel.send('Hey {0.author.mention}'.format(message))
+
+        # Adds/removes users from the blacklist: "noreply"
+        if msgStartsWith(message, 'noreply'):
+            if message.author.id in noreply:
+                noreply.remove(message.author.id)
+                f.updateBlacklist(noreply)
+                await channel.send("You have been successfully removed from the blacklist")
+            else:
+                noreply.append(message.author.id)
+                f.updateBlacklist(noreply)
+                await channel.send("You have been added to the blacklist")
+        
+         # Replies with the amount of times HERA has replied to the specified user, if no username is given 
         # then it defaults to the author of the message: "stats"
         if msgStartsWith(message, 'stats'):
             if len(message.mentions) == 1: 
@@ -123,6 +106,24 @@ async def on_message(message):
                 embed.add_field(name="Users", value=users, inline=True)
                 embed.add_field(name="Times they've been got", value=times, inline=True)
                 await channel.send(embed=embed) 
+
+        # Prints the current blacklist: "blacklist"
+        if msgStartsWith(message, 'blacklist'):
+            blacklist = []
+            for i in noreply:
+                user = await client.fetch_user(i)
+                blacklist.append(str(user.display_name))
+            msg = "Currently blacklisted users are: " + ", ".join(blacklist)
+            await channel.send(msg)
+
+        # Reply with the user's UUID: "id"
+        if msgStartsWith(message, 'id'): 
+            if len(message.mentions) == 1: 
+                uuid = message.mentions[0].id
+            elif len(message.mentions) > 1: return
+            else: 
+                uuid = message.author.id
+            await channel.send(client.get_user(uuid).name +"'s UUID is: " + str(uuid))
 
     #creator only commands
         #checks if the author's user id is @Ketchup#1687
