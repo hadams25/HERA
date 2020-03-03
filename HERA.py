@@ -8,10 +8,12 @@ TOKEN = f.readToken()
 client = discord.Client()
 noreply = []
 noreply = f.readBlacklist()
-pre = "~"
+pre = "!"
 stats = writer.dict_writer(file = "usage_stats.txt")
 if not stats.does_exist: stats.generate_file()
-def msgStartsWith(message, str): return message.content.lower().startswith(str)
+def regexMatch(message, regex): 
+    regex = re.compile(regex)
+    return regex.match(message.content)
 
 #this code is so bad
 @client.event
@@ -23,11 +25,11 @@ async def on_message(message):
         return
 
     #Commands
-    if msgStartsWith(message, pre):
+    if regexMatch(message, pre):
         message.content = message.content[1:]
 
         # Prints the help menu: "help"
-        if  msgStartsWith(message, 'help'):
+        if  regexMatch(message, 'help\\s*\\Z'):
             msg = ("Hey, {0.author.mention} here's my list of commands.\n".format(message) +
             pre +'hello - Says hello back and pings you\n' +
             pre +'noreply - Toggles dad joke opportunity detection for you\n' +
@@ -40,10 +42,10 @@ async def on_message(message):
             await channel.send(msg)
 
         # Essentially ping, without the time measurement: "hello"
-        if msgStartsWith(message, 'hello'): await channel.send('Hey {0.author.mention}'.format(message))
+        if regexMatch(message, 'hello\\s*\\Z'): await channel.send('Hey {0.author.mention}'.format(message))
 
         # Adds/removes users from the blacklist: "noreply"
-        if msgStartsWith(message, 'noreply'):
+        if regexMatch(message, 'noreply\\s*\\Z'):
             if message.author.id in noreply:
                 noreply.remove(message.author.id)
                 f.updateBlacklist(noreply)
@@ -55,7 +57,7 @@ async def on_message(message):
         
          # Replies with the amount of times HERA has replied to the specified user, if no username is given 
         # then it defaults to the author of the message: "stats"
-        if msgStartsWith(message, 'stats'):
+        if regexMatch(message, 'stats\\s*\\Z'):
             if len(message.mentions) == 1: 
                 uuid = message.mentions[0].id
             elif len(message.mentions) > 1: return
@@ -71,7 +73,7 @@ async def on_message(message):
                 await channel.send(client.get_user(uuid).name + " has been dad'ed " + str(author_stats) + " times.")
         
         # Shows the current top 10 users
-        if msgStartsWith(message, 'leaderboard'):
+        if regexMatch(message, 'leaderboard\\s*\\Z'):
                 if stats.get_length() < 10: _max = stats.get_length()
                 else: _max = 10
                 board = []
@@ -109,7 +111,7 @@ async def on_message(message):
                 await channel.send(embed=embed) 
 
         # Prints the current blacklist: "blacklist"
-        if msgStartsWith(message, 'blacklist'):
+        if regexMatch(message, 'blacklist\\s*\\Z'):
             blacklist = []
             for i in noreply:
                 user = await client.fetch_user(i)
@@ -118,7 +120,7 @@ async def on_message(message):
             await channel.send(msg)
 
         # Reply with the user's UUID: "id"
-        if msgStartsWith(message, 'id'): 
+        if regexMatch(message, 'id\\s*\\Z'): 
             if len(message.mentions) == 1: 
                 uuid = message.mentions[0].id
             elif len(message.mentions) > 1: return
@@ -130,16 +132,16 @@ async def on_message(message):
         #checks if the author's user id is @Ketchup#1687
         if message.author.id == 243885191527923723:
             #kills the bot
-            if msgStartsWith(message, 'stop'):
+            if regexMatch(message, 'stop\\s*\\Z'):
                 await channel.send("Going offline...")
                 await client.logout()
             
             #makes the bot repeat whatever you say
-            if msgStartsWith(message, 'speak'):
+            if regexMatch(message, 'speak\\s*\\Z'):
                 await channel.send(message.content[7:])
 
             #Edits the specified users dad count
-            if msgStartsWith(message, 'update'):
+            if regexMatch(message, 'update'):
                 msg = message.content
                 if len(message.mentions) != 1 or (msg.find("+") == -1 and msg.find("-") == -1): 
                     await channel.send("Bad syntax:\n" + pre +" @user +/-[value]")
@@ -156,9 +158,8 @@ async def on_message(message):
 
     #Daddening Logic
     try:
-        matcher = re.compile("([iI]['’]?[mM])|([Mm][Ee])\\s+.")
         #if "im" or "me"
-        if (matcher.match(message.content)):
+        if (regexMatch(message, "([iI]['’]?[mM])|([Mm][Ee])\\s+.")):
 
             if message.author.id in noreply: return
             msg = message.content
