@@ -159,7 +159,7 @@ async def on_message(message):
     #Daddening Logic
     try:
         #if "im" or "me"
-        if (regexMatch(message, "([iI]['’]?[mM])|([Mm][Ee])\\s+.")):
+        if (regexMatch(message, "(([iI]['’]?[mM])|([Mm][Ee]))\\s+[^\\s]")):
 
             if message.author.id in noreply: return
             msg = message.content
