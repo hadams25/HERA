@@ -2,6 +2,7 @@ import discord
 import file_utils as f
 import dict_writer as writer
 import random
+import re
 
 TOKEN = f.readToken()
 client = discord.Client()
@@ -155,14 +156,9 @@ async def on_message(message):
 
     #Daddening Logic
     try:
+        matcher = re.compile("([iI]['’]?[mM])|([Mm][Ee])\\s+.")
         #if "im" or "me"
-        if (msgStartsWith(message, "im ") or msgStartsWith(message, "me ") or 
-        #if "i"
-            (ord(message.content.lower()[0]) == 105 and 
-        #if "'" or iphone apostrophe
-            (ord(message.content.lower()[1]) == 39 or ord(message.content.lower()[1]) == 8217) and 
-        #if "m"
-            ord(message.content.lower()[2]) == 109 and message.content.lower()[3] == " ")):
+        if (matcher.match(message.content)):
 
             if message.author.id in noreply: return
             msg = message.content
