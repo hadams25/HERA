@@ -179,7 +179,7 @@ async def on_message(message):
             #Edits the specified users dad count
             if regexMatch(message, 'update\\b'):
                 msg = message.content
-                if len(message.mentions) != 1 or regexSearch(message, "[\\-+][0-9]+"): 
+                if len(message.mentions) != 1 or not regexSearch(message, "[\\-+][0-9]+"): 
                     lastmsg.append(await channel.send("Bad syntax:\n" + pre +" @user +/-[value]"))
                     return
                 else: uuid = message.mentions[0].id
