@@ -179,12 +179,12 @@ async def on_message(message):
             #Edits the specified users dad count
             if regexMatch(message, 'update\\b'):
                 msg = message.content
-                if len(message.mentions) != 1 and not regexSearch(message, "[\-+][0-9]+"): 
+                print(str(regexSearch(message, "[\-+]([0-9])+")))
+                if not (len(message.mentions) == 1 and regexSearch(message, "[\-+]([0-9])+")): 
                     lastmsg.append(await channel.send("Bad syntax:\n" + pre +" @user +/-[value]"))
                     return
                 else: uuid = message.mentions[0].id
                 value = int(regexGetMatch(message, "[\-+][0-9]+", 0))
-                lastmsg.append(await channel.send("Bad syntax:\n" + pre +" @user +/-[value]"))
                 author_stats = stats.get_definition(str(uuid))
                 if author_stats == None: author_stats = 0
                 stats.update_value({str(uuid) : int(author_stats) + value})
