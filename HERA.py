@@ -75,12 +75,12 @@ async def on_message(message):
             if message.author.id in noreply:
                 noreply.remove(message.author.id)
                 f.updateBlacklist(noreply)
-                if (not regexSearch(message, "[\\-~](silent|[sS])")): 
+                if (not regexSearch(message, "[\-~](silent|[sS])")): 
                     lastmsg.append(await channel.send("You have been successfully removed from the blacklist"))
             else:
                 noreply.append(message.author.id)
                 f.updateBlacklist(noreply)
-                if (not regexSearch(message, "[\\-~](silent|[sS])")): 
+                if (not regexSearch(message, "[\-~](silent|[sS])")): 
                     lastmsg.append(await channel.send("You have been added to the blacklist"))
             return
         
@@ -105,7 +105,7 @@ async def on_message(message):
         # Shows the current top 10 users
         if regexMatch(message, 'leaderboard\\b'):
             if stats.get_length() < 10: _max = stats.get_length()
-            elif (regexSearch(message, "[\\-~]([aA]ll|[aA])")): _max = stats.get_length()
+            elif (regexSearch(message, "[\-~]([aA]ll|[aA])")): _max = stats.get_length()
             else: _max = 10
             board = []
             for i in range(0,_max):
@@ -167,7 +167,7 @@ async def on_message(message):
         if message.author.id == 243885191527923723:
             #kills the bot
             if regexMatch(message, 'stop\\b'):
-                if (not regexSearch(message, "[\\-~](silent|[sS])")): 
+                if (not regexSearch(message, "[\-~](silent|[sS])")): 
                     await channel.send("Going offline...")
                 await client.logout()
             
@@ -179,16 +179,16 @@ async def on_message(message):
             #Edits the specified users dad count
             if regexMatch(message, 'update\\b'):
                 msg = message.content
-                if len(message.mentions) != 1 or not regexSearch(message, "[\\-+][0-9]+"): 
+                if len(message.mentions) != 1 or not regexSearch(message, "[\-+][0-9]+"): 
                     lastmsg.append(await channel.send("Bad syntax:\n" + pre +" @user +/-[value]"))
                     return
                 else: uuid = message.mentions[0].id
-                value = int(regexGetMatch(message, "[\\-+][0-9]+", 0))
+                value = int(regexGetMatch(message, "[\-+][0-9]+", 0))
                 lastmsg.append(await channel.send("Bad syntax:\n" + pre +" @user +/-[value]"))
                 author_stats = stats.get_definition(str(uuid))
                 if author_stats == None: author_stats = 0
                 stats.update_value({str(uuid) : int(author_stats) + value})
-                if (not regexSearch(message, "[\\-~](silent|[sS])")): 
+                if (not regexSearch(message, "[\-~](silent|[sS])")): 
                     lastmsg.append(await channel.send(client.get_user(uuid).name +" has now been dad'ed " + str(stats.get_definition(str(uuid)) + " times.")))
                 return
             
@@ -198,7 +198,7 @@ async def on_message(message):
                     lastmsg.append(await channel.send("No messages in history."))
                     return
                 if(regexSearch(message, "[0-9]+")): index = int(regexGetMatch(message, "[0-9]+", 0)) + 1
-                if(regexSearch(message, "[\\-~](all|[aA])")): index = len(lastmsg)
+                if(regexSearch(message, "[\-~](all|[aA])")): index = len(lastmsg)
                 else: index = 1
                 for _ in range(0, index):
                     tmpMsg = lastmsg.pop()
@@ -213,7 +213,7 @@ async def on_message(message):
                             await tmpMsg.delete()
                         except:
                             print("\nError deleting message: " + tmpMsg.content +"\n")
-                if (not regexSearch(message, "[\\-~](silent|[sS])")): 
+                if (not regexSearch(message, "[\-~](silent|[sS])")): 
                     lastmsg.append(await channel.send("Deleted " + str(index) + " message(s)."))
                 return
             
