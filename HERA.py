@@ -9,7 +9,7 @@ TOKEN = f.readToken()
 client = discord.Client()
 noreply = []
 noreply = f.readBlacklist()
-pre = "!"
+pre = "~"
 stats = writer.dict_writer(file = "usage_stats.txt")
 if not stats.does_exist: stats.generate_file()
 def regexMatch(message, regex): 
@@ -105,7 +105,7 @@ async def on_message(message):
         # Shows the current top 10 users
         if regexMatch(message, 'leaderboard\\b'):
             if stats.get_length() < 10: _max = stats.get_length()
-            elif (not regexSearch(message, "[\\-~]([aA]ll|[aA])")): _max = stats.get_length()
+            elif (regexSearch(message, "[\\-~]([aA]ll|[aA])")): _max = stats.get_length()
             else: _max = 10
             board = []
             for i in range(0,_max):
